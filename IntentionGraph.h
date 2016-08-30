@@ -16,7 +16,7 @@
 
 #include "BayesianNetwork.h"
 #include "Mdp.h"
-
+#include <map>
 
 struct IntentionNode {
     string name;
@@ -33,10 +33,13 @@ public:
     void setGraph(std::vector<string> contexts, std::vector<IntentionNode> intention, std::vector<string> actions, 
     std::vector<Mdp*> mdps, VariableSet state);
     
-    void computeProbability(VariableSet evidence);
+    std::map<string,double> computeProbability(VariableSet evidence);
     
 private:
     BayesianNetwork *bn;
+   
+    std::vector<string> intentions_;
+    std::vector<string> actions_;
     
     void createActionNodes(std::vector<string> actions, std::vector<string> intention_list, std::vector<Mdp*> mdps, VariableSet state);
 

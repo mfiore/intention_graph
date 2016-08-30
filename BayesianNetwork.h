@@ -6,7 +6,7 @@
  */
 
 #ifndef BAYESIANNETWORK_H
-#define	BAYESIANNETWORK_H
+#define BAYESIANNETWORK_H
 
 #include <dlib/bayes_utils.h>
 #include <dlib/graph_utils.h>
@@ -16,7 +16,7 @@
 #include <boost/foreach.hpp>
 #include <vector>
 #include "NestedLoop.h"
-
+#include <map>
 using namespace dlib;
 using namespace std;
 using namespace bayes_node_utils;
@@ -27,6 +27,15 @@ struct probAssignment {
     std::map<string, string> parentValues;
     string value;
     double prob;
+};
+
+struct NodeAssignment {
+    string name;
+    int value;
+
+    bool operator<(const NodeAssignment &o) const {
+        return name < o.name || name == o.name && value < o.value;
+    }
 };
 
 class BayesianNetwork {
@@ -45,7 +54,7 @@ public:
     int getIndex(string label);
     std::map<string, int> getValues(int i);
     std::map<string, int> getValues(string label);
-    void computeProbability(std::map<string, string> nodeValues);
+   std::map<NodeAssignment, double> computeProbability(std::map<string, string> nodeValues);
 
     bool addNode(string node, std::vector<string> parents, bool isTemporal, string probabilityMode, string dominantParent);
 
@@ -65,5 +74,5 @@ private:
     int lastIndex;
 };
 
-#endif	/* BAYESIANNETWORK_H */
+#endif /* BAYESIANNETWORK_H */
 

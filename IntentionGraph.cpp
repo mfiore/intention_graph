@@ -25,6 +25,10 @@ IntentionGraph::~IntentionGraph() {
 
 void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<IntentionNode> intentions, std::vector<string> actions,
         std::vector<Mdp*> mdps, VariableSet state) {
+    
+    intentions_=intentions;
+    actions_=actions;
+    
     int bn_size = contexts.size() + intentions.size() + actions.size() + actions.size()*2;
     if (bn != NULL) {
         delete bn;
@@ -110,6 +114,14 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
     }
 }
 
-void IntentionGraph::computeProbability(VariableSet evidence) {
-    bn->computeProbability(evidence.set);
+std::map<string,double> IntentionGraph::computeProbability(VariableSet evidence) {
+   std::map<NodeAssignment,double> probability=bn->computeProbability(evidence.set);
+
+   std::map<string,double> result;
+   for (std::map<NodeAssignment,double>::iterator i=probability.begin();i!=probability.end();i++) {
+       if (i->first.value==1) {
+           result[i->first.name]=i->second;
+       }
+   }
+   return result;
 }

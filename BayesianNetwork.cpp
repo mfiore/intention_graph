@@ -51,7 +51,7 @@ void BayesianNetwork::updateJoinTree() {
     create_join_tree(join_tree, join_tree);
 }
 
-void BayesianNetwork::computeProbability(std::map<string, string> evidence) {
+std::map<NodeAssignment,double> BayesianNetwork::computeProbability(std::map<string, string> evidence) {
     // Now to make things more interesting let's say that we have discovered that the C 
     // node really has a value of 1.  That is to say, we now have evidence that 
     // C is 1.  We can represent this in the network using the following two function
@@ -79,6 +79,7 @@ void BayesianNetwork::computeProbability(std::map<string, string> evidence) {
 
 
 
+    std::map<NodeAssignment,double> result;
 
 
     for (std::map<string, std::map<string, int> >::iterator i = nodeValues.begin(); i != nodeValues.end(); i++) {
@@ -87,9 +88,15 @@ void BayesianNetwork::computeProbability(std::map<string, string> evidence) {
 
         for (int j = 0; j < i->second.size(); j++) {
             cout << "p(node " << i->first << "==" << j << ") = " << solution.probability(nodeIndex)(j) << " \n";
+            
+            NodeAssignment n;
+            n.name=i->first;
+            n.value=j;
+            result[n]=solution.probability(nodeIndex)(j);
         }
 
     }
+    return result;
 }
 
 string BayesianNetwork::getLabel(int i) {
