@@ -21,7 +21,7 @@
 struct IntentionNode {
     string name;
     std::vector<string> linked_contexts;
-    double influence;
+    std::vector<double> influence;
 };
 
 
