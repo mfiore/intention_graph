@@ -59,6 +59,8 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
         std::vector<string> parents = {action};
         bn->addMultiValueNode("distance_" + action, action, distanceValues);
         bn->addNode("toward_" + action, parents, false, "dominantParent", action);
+        observation_nodes_.push_back("distance_"+action);
+        observation_nodes_.push_back("toward_"+action);
     }
 
     bn->updateJoinTree();
@@ -144,7 +146,7 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
             std::vector<double> single_utilities(intention_list.size(), 0);
             for (int i = 0; i < intention_list.size(); i++) {
                 probRow.parentValues[intention_list[i]] = intention_values[row[i]];
-                std::vector<string> mdp_actions = mdps[i]->actions;
+                std::vector<string> mdp_actions = mdps[i]->actions_;
                 if (std::find(mdp_actions.begin(), mdp_actions.end(), a) == mdp_actions.end()) {
                     single_utilities[i] == 0;
                 } else {
@@ -207,4 +209,8 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
 
 void IntentionGraph::computeProbability(VariableSet evidence) {
     bn->computeProbability(evidence.set);
+}
+
+std::vector<std::string> IntentionGraph::getObservationNodes() {
+    return observation_nodes_;
 }
