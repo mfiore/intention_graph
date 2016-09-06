@@ -60,7 +60,11 @@ public:
 
     bool addNode(string node, std::vector<string> parents, std::vector<probAssignment> probTable);
 
+    bool addNode(string node, std::vector<string> parents, double influence);
+
     bool addMultiValueNode(string node, string parent, std::vector<string> values);
+
+    bool addExclusiveOrNode(string node, std::vector<string> parents);
 
 private:
     directed_graph<bayes_node>::kernel_1a_c *bn;

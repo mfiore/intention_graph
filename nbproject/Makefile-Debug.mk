@@ -57,21 +57,21 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libIntentionGraph.${CND_DLIB_EXT}
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libintention_graph.${CND_DLIB_EXT}
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libIntentionGraph.${CND_DLIB_EXT}: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libintention_graph.${CND_DLIB_EXT}: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libIntentionGraph.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -shared -fPIC
+	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libintention_graph.${CND_DLIB_EXT} ${OBJECTFILES} ${LDLIBSOPTIONS} -shared -fPIC
 
 ${OBJECTDIR}/BayesianNetwork.o: BayesianNetwork.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../../devel/src/dlib-18.18 -I../pomdp -std=c++11 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BayesianNetwork.o BayesianNetwork.cpp
+	$(COMPILE.cc) -g -I../pomdp -I../../devel/src/dlib-18.11 -I../../devel/src/eigen -std=c++11 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BayesianNetwork.o BayesianNetwork.cpp
 
 ${OBJECTDIR}/IntentionGraph.o: IntentionGraph.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -I../../devel/src/dlib-18.18 -I../pomdp -std=c++11 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/IntentionGraph.o IntentionGraph.cpp
+	$(COMPILE.cc) -g -I../pomdp -I../../devel/src/dlib-18.11 -I../../devel/src/eigen -std=c++11 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/IntentionGraph.o IntentionGraph.cpp
 
 # Subprojects
 .build-subprojects:
@@ -79,7 +79,7 @@ ${OBJECTDIR}/IntentionGraph.o: IntentionGraph.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libIntentionGraph.${CND_DLIB_EXT}
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libintention_graph.${CND_DLIB_EXT}
 
 # Subprojects
 .clean-subprojects:
