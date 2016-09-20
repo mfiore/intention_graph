@@ -51,7 +51,7 @@ void BayesianNetwork::updateJoinTree() {
     create_join_tree(join_tree, join_tree);
 }
 
-std::map<NodeAssignment,double> BayesianNetwork::computeProbability(std::map<string, string> evidence) {
+std::map<NodeAssignment, double> BayesianNetwork::computeProbability(std::map<string, string> evidence) {
     // Now to make things more interesting let's say that we have discovered that the C 
     // node really has a value of 1.  That is to say, we now have evidence that 
     // C is 1.  We can represent this in the network using the following two function
@@ -79,7 +79,7 @@ std::map<NodeAssignment,double> BayesianNetwork::computeProbability(std::map<str
 
 
 
-    std::map<NodeAssignment,double> result;
+    std::map<NodeAssignment, double> result;
 
 
     for (std::map<string, std::map<string, int> >::iterator i = nodeValues.begin(); i != nodeValues.end(); i++) {
@@ -88,11 +88,11 @@ std::map<NodeAssignment,double> BayesianNetwork::computeProbability(std::map<str
 
         for (int j = 0; j < i->second.size(); j++) {
             cout << "p(node " << i->first << "==" << j << ") = " << solution.probability(nodeIndex)(j) << " \n";
-            
+
             NodeAssignment n;
-            n.name=i->first;
-            n.value=j;
-            result[n]=solution.probability(nodeIndex)(j);
+            n.name = i->first;
+            n.value = j;
+            result[n] = solution.probability(nodeIndex)(j);
         }
 
     }
@@ -189,7 +189,7 @@ bool BayesianNetwork::addMultiValueNode(string node, string parent, std::vector<
     }
 }
 
-bool BayesianNetwork::addNode(string node, std::vector<string> parents, double influence) {
+bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vector<double> influence) {
     //check if parents exist  and load their values in tableVariables;
     std::vector<std::vector<int> > tableVariables;
 
@@ -227,20 +227,28 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, double i
         bn->add_edge(nodeLabels[parent], nodeIndex);
     }
     if (parents.size() == 0) {
-        double p = influence;
+        double p = 0.5;
         assignment parent_state;
         set_node_probability(*bn, nodeIndex, 1, parent_state, p);
         set_node_probability(*bn, nodeIndex, 0, parent_state, 1 - p);
     } else {
+
+        assignment parent_state;
+
         for (int i = 0; i < tableAssignments.size(); i++) {
             double p;
-            if (tableAssignments[i][0] == 0) {
-                p = 0.5;
-            } else {
-                p = influence;
+            double max_influence = 0;
+            for (int j = 0; j < tableAssignments[i].size(); j++) {
+                if (tableAssignments[i][j] == 1) {
+                    if (influence[j] > max_influence) {
+                        max_influence = influence[j];
+                    }
+                }
+                parent_state.add(nodeLabels[parents[j]], tableAssignments[i][j]);
+
             }
-            assignment parent_state;
-            parent_state.add(nodeLabels[parents[0]],tableAssignments[i][0]);
+            p=max_influence!=0?max_influence:0.5;
+
             set_node_probability(*bn, nodeIndex, 1, parent_state, p);
             set_node_probability(*bn, nodeIndex, 0, parent_state, 1 - p);
         }

@@ -60,7 +60,7 @@ public:
 
     bool addNode(string node, std::vector<string> parents, std::vector<probAssignment> probTable);
 
-    bool addNode(string node, std::vector<string> parents, double influence);
+    bool addNode(string node, std::vector<string> parents, std::vector<double> influence);
 
     bool addMultiValueNode(string node, string parent, std::vector<string> values);
 

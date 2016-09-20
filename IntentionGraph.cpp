@@ -26,8 +26,8 @@ IntentionGraph::~IntentionGraph() {
 void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<IntentionNode> intentions, std::vector<string> actions,
         std::vector<Mdp*> mdps, VariableSet state) {
     
-    intentions_=intentions;
-    actions_=actions;
+//    intentions_=intentions;
+//    actions_=actions;
     
     int bn_size = contexts.size() + intentions.size() + actions.size() + actions.size()*2;
     if (bn != NULL) {

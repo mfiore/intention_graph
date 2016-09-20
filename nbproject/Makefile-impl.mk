@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=intention_graph
+PROJECTNAME=IntentionGraph
 
 # Active Configuration
 DEFAULTCONF=Debug

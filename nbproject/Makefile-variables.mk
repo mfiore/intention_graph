@@ -9,19 +9,19 @@ CND_DISTDIR=dist
 # Debug configuration
 CND_PLATFORM_Debug=GNU-Linux
 CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux
-CND_ARTIFACT_NAME_Debug=libintention_graph.so
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/libintention_graph.so
+CND_ARTIFACT_NAME_Debug=libIntentionGraph.so
+CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux/libIntentionGraph.so
 CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux/package
-CND_PACKAGE_NAME_Debug=libintentiongraph.so.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/libintentiongraph.so.tar
+CND_PACKAGE_NAME_Debug=libIntentionGraph.so.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux/package/libIntentionGraph.so.tar
 # Release configuration
 CND_PLATFORM_Release=GNU-Linux
 CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux
-CND_ARTIFACT_NAME_Release=libintention_graph.so
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/libintention_graph.so
+CND_ARTIFACT_NAME_Release=libIntentionGraph.so
+CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux/libIntentionGraph.so
 CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux/package
-CND_PACKAGE_NAME_Release=libintentiongraph.so.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/libintentiongraph.so.tar
+CND_PACKAGE_NAME_Release=libIntentionGraph.so.tar
+CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux/package/libIntentionGraph.so.tar
 #
 # include compiler specific variables
 #
