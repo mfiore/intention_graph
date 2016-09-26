@@ -37,6 +37,8 @@ public:
     std::map<string,double> computeProbability(VariableSet evidence);
     
     std::vector<std::string> getObservationNodes();
+    std::vector<std::string> getContextNodes();
+    std::vector<std::string> getActionNodes();
     
 private:
     BayesianNetwork *bn;
@@ -47,6 +49,7 @@ private:
     void createActionNodes(std::vector<string> actions, std::vector<string> intention_list, std::vector<Mdp*> mdps, VariableSet state);
 
     std::vector<std::string> observation_nodes_;
+    std::vector<std::string> context_nodes_;
 };
 
 #endif /* INTENTIONGRAPH_H */

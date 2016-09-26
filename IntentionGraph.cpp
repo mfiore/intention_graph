@@ -28,6 +28,7 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
     
 //    intentions_=intentions;
 //    actions_=actions;
+    context_nodes_=contexts;
     
     int bn_size = contexts.size() + intentions.size() + actions.size() + actions.size()*2;
     if (bn != NULL) {
@@ -226,3 +227,10 @@ std::vector<std::string> IntentionGraph::getObservationNodes() {
     return observation_nodes_;
 }
 
+std::vector<std::string> IntentionGraph::getContextNodes() {
+    return context_nodes_;
+}
+
+std::vector<std::string> IntentionGraph::getActionNodes() {
+    return actions_;
+}
