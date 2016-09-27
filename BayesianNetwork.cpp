@@ -233,9 +233,9 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vec
         set_node_probability(*bn, nodeIndex, 0, parent_state, 1 - p);
     } else {
 
-        assignment parent_state;
-
         for (int i = 0; i < tableAssignments.size(); i++) {
+            assignment parent_state;
+
             double p;
             double max_influence = 0;
             for (int j = 0; j < tableAssignments[i].size(); j++) {
@@ -248,7 +248,6 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vec
 
             }
             p=max_influence!=0?max_influence:0.5;
-
             set_node_probability(*bn, nodeIndex, 1, parent_state, p);
             set_node_probability(*bn, nodeIndex, 0, parent_state, 1 - p);
         }
