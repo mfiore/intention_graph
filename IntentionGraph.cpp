@@ -45,6 +45,7 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
         bn->addNode(intentions[i].name, intentions[i].linked_contexts, intentions[i].influence);
         intention_list.push_back(intentions[i].name);
     }
+
     //intention or node
     bn->addExclusiveOrNode("IntentionsOr", intention_list);
     createActionNodes(actions, intention_list, mdps, state);
@@ -59,11 +60,10 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
     for (string action : actions) {
         std::vector<string> parents = {action};
         bn->addMultiValueNode("distance_" + action, action, distanceValues);
-        bn->addNode("toward_" + action, parents, false, "dominantParent", action);
+        bn->addNode("deltaDistance_" + action, parents, false, "dominantParent", action);
         observation_nodes_.push_back("distance_" + action);
-        observation_nodes_.push_back("toward_" + action);
+        observation_nodes_.push_back("deltaDistance_" + action);
     }
-
     bn->updateJoinTree();
 }
 
@@ -128,18 +128,14 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
         mdp_actions.push_back(par_actions);
     }
 
-    cout << "Action Values\n";
     std::vector<double> sumq(intention_list.size(), 0);
     for (int i = 0; i < mdps.size(); i++) {
         for (string a : mdp_actions[i]) {
             double q = mdps[i]->getQValue(state, a);
             //            cout << intentions[i] << " " << a << " " << q << "\n";
-            cout<<"crash here?\n";
             sumq[i] = sumq[i] + q;
-            cout<<"Or not?\n";
         }
     }
-    cout << "sumq\n";
     std::map<string, std::vector<double> > all_q_intentions;
     for (int i = 0; i < intention_list.size(); i++) {
         std::vector<double> all_q;
@@ -149,7 +145,6 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
         std::sort(all_q.begin(), all_q.end());
         all_q_intentions[intention_list[i]] = all_q;
     }
-    cout << "allqintentions\n";
 
     std::vector<string> intention_values = {"f", "t"};
     for (string a : actions) {
