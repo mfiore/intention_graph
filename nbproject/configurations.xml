@@ -68,6 +68,12 @@
         </cTool>
         <ccTool>
           <developmentMode>5</developmentMode>
+          <standard>8</standard>
+          <incDir>
+            <pElem>../pomdp</pElem>
+            <pElem>../../devel/src/eigen</pElem>
+            <pElem>../../devel/src/dlib-18.18</pElem>
+          </incDir>
         </ccTool>
         <fortranCompilerTool>
           <developmentMode>5</developmentMode>

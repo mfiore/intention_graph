@@ -66,12 +66,12 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libIntentionGraph.${CND_DLIB_EXT}: ${
 ${OBJECTDIR}/BayesianNetwork.o: BayesianNetwork.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BayesianNetwork.o BayesianNetwork.cpp
+	$(COMPILE.cc) -O2 -I../pomdp -I../../devel/src/eigen -I../../devel/src/dlib-18.18 -std=c++11 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BayesianNetwork.o BayesianNetwork.cpp
 
 ${OBJECTDIR}/IntentionGraph.o: IntentionGraph.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/IntentionGraph.o IntentionGraph.cpp
+	$(COMPILE.cc) -O2 -I../pomdp -I../../devel/src/eigen -I../../devel/src/dlib-18.18 -std=c++11 -fPIC  -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/IntentionGraph.o IntentionGraph.cpp
 
 # Subprojects
 .build-subprojects:

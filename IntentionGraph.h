@@ -50,6 +50,9 @@ private:
 
     std::vector<std::string> observation_nodes_;
     std::vector<std::string> context_nodes_;
+
+    std::map<std::string, int> cost_intention_;
+    std::map<std::string,bool> has_decreased_cost_;
 };
 
 #endif /* INTENTIONGRAPH_H */

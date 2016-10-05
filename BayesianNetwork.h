@@ -75,6 +75,7 @@ private:
 
     std::vector<int> numValues;
 
+    
     int lastIndex;
 };
 
