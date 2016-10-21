@@ -30,7 +30,7 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
     actions_ = actions;
     context_nodes_ = contexts;
 
-    int bn_size = contexts.size() + intentions.size() + actions.size() + actions.size()*2+2;
+    int bn_size = contexts.size() + intentions.size() + actions.size() + actions.size()*2 + 2;
     if (bn != NULL) {
         delete bn;
     }
@@ -42,8 +42,11 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
 
     std::vector<string> intention_list;
     for (int i = 0; i < intentions.size(); i++) {
-        bn->addNode(intentions[i].name, intentions[i].linked_contexts, intentions[i].influence);
-        intention_list.push_back(intentions[i].name);
+        VariableSet mdp_state = mdps[i]->convertToParametrizedState(state);
+        if (std::find(mdps[i]->goal_states_.begin(), mdps[i]->goal_states_.end(), mdps[i]->map_state_enum_[mdp_state]) == mdps[i]->goal_states_.end()) {
+            bn->addNode(intentions[i].name, intentions[i].linked_contexts, intentions[i].influence);
+            intention_list.push_back(intentions[i].name);
+        }
     }
 
     //intention or node
@@ -106,7 +109,7 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
 
     for (int i = 0; i < mdps.size(); i++) {
         mdp_states[i] = mdps[i]->convertToParametrizedState(state);
-//                cout<<mdp_states.at(i).toString()<<"\n";
+        //                cout<<mdp_states.at(i).toString()<<"\n";
     }
     for (string intention : intention_list) {
         std::map<string, int> nodeValues = bn->getValues(intention);
@@ -141,8 +144,8 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
         for (string a : mdp_actions[i]) {
 
             double q = mdps[i]->getQValue(mdp_states.at(i), a);
-//                        cout<<"qvalue for "<<a<<" is"<<q<<"\n";
-//            cout << intention_list[i] << " " << a << " " << q << "\n";
+            //                        cout<<"qvalue for "<<a<<" is"<<q<<"\n";
+            //            cout << intention_list[i] << " " << a << " " << q << "\n";
             sumq[i] = sumq[i] + q;
         }
     }
@@ -231,8 +234,8 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
 }
 
 std::map<string, double> IntentionGraph::computeProbability(VariableSet evidence) {
-        evidence.set["ActionsOr"]="t";
-        evidence.set["IntentionsOr"]="t";
+    evidence.set["ActionsOr"] = "t";
+    evidence.set["IntentionsOr"] = "t";
 
     std::map<NodeAssignment, double> probability = bn->computeProbability(evidence.set);
 
