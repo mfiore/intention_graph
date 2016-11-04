@@ -8,7 +8,7 @@
 #include "BayesianNetwork.h"
 #include <iostream>
 
-BayesianNetwork::BayesianNetwork(int size) {
+BayesianNetwork::BayesianNetwork(int size, int n_approximation_loops) : approximation_loops(n_approximation_loops) {
     lastIndex = -1;
     bn = new directed_graph<bayes_node>::kernel_1a_c();
     bn->set_number_of_nodes(size);
@@ -21,108 +21,72 @@ BayesianNetwork::BayesianNetwork(const BayesianNetwork& orig) {
 BayesianNetwork::~BayesianNetwork() {
 }
 
-void BayesianNetwork::loadGraph(string networkPath, std::map<string, int> nodeLabels, std::map<string, std::map<string, int> > nodeValues, std::vector<bool> isTemporal) {
-    try {
-
-        this->nodeLabels = nodeLabels;
-        this->nodeValues = nodeValues;
-        this->isTemporal = isTemporal;
-
-        ifstream fin(networkPath.c_str(), ios::binary);
-
-        // Note that the saved networks produced by the bayes_net_gui_ex.cpp example can be deserialized
-        // into a network.  So you can make your networks using that GUI if you like.
-        cout << "Loading the network from disk..." << endl;
-        deserialize(*bn, fin);
-
-        cout << "Number of nodes in the network: " << bn->number_of_nodes() << endl;
-
-
-
-
-    } catch (exception& e) {
-        cout << "exception thrown: " << e.what() << endl;
-
-    }
-}
-
 void BayesianNetwork::updateJoinTree() {
     create_moral_graph(*bn, join_tree);
     create_join_tree(join_tree, join_tree);
 }
 
 std::map<NodeAssignment, double> BayesianNetwork::computeProbability(std::map<string, string> evidence) {
-    // Now to make things more interesting let's say that we have discovered that the C 
-    // node really has a value of 1.  That is to say, we now have evidence that 
-    // C is 1.  We can represent this in the network using the following two function
-    // calls.
     for (int i = 0; i < bn->number_of_nodes(); i++) {
         set_node_as_nonevidence(*bn, i);
         set_node_value(*bn, i, 0);
-        //                cout << "Number of parents of node " << i << "= " << bn->node(i).number_of_parents() << "\n";
-        //                cout << "CPT stil filled? " << node_cpt_filled_out(*bn, i) << "\n";
     }
     for (std::map<string, string>::iterator i = evidence.begin(); i != evidence.end(); i++) {
         set_node_value(*bn, nodeLabels[i->first], nodeValues[i->first][i->second]);
         set_node_as_evidence(*bn, nodeLabels[i->first]);
     }
 
-
-
-
-    // Now we have a proper join_tree we can use it to obtain a solution to our
-    // bayesian network.  Doing this is as simple as declaring an instance of
-    // the bayesian_network_join_tree object as follows:
-//        bayesian_network_join_tree solution(*bn, join_tree);
-    // now print out the probabilities for each node
-    //    cout << "Using the join tree algorithm with solution size:" << solution.number_of_nodes() << "\n";
-
-    bayesian_network_gibbs_sampler sampler;
-//
-    std::vector<int> counts(bn->number_of_nodes(), 0);
-//
-//
-    const long rounds = 1500;
-    for (long i = 0; i < rounds; i++) {
-        sampler.sample_graph(*bn);
-
-        for (int j = 0; j < counts.size(); j++) {
-//            cout<<node_value(*bn,j)<<"\n";
-            if (node_value(*bn, j) == 1) {
-                counts[j]++;
-            }
-        }
-
-    }
-//
     std::map<NodeAssignment, double> result;
 
-    for (std::map<std::string, int>::iterator n = nodeLabels.begin(); n != nodeLabels.end(); n++) {
-        NodeAssignment ass;
-        ass.name = n->first;
-        ass.value = 1;
-//        cout<<counts[n->second]<<"\n";
-        result[ass] = (double) counts[n->second] / (double) rounds;
+    if (approximation_loops == 0) {
+        bayesian_network_join_tree solution(*bn, join_tree);
 
+
+        for (std::map<string, std::map<string, int> >::iterator i = nodeValues.begin(); i != nodeValues.end(); i++) {
+            // print out the probability distribution for node i.  
+            int nodeIndex = nodeLabels[i->first];
+
+            for (int j = 0; j < i->second.size(); j++) {
+                //            cout << "p(node " << i->first << "==" << j << ") = " << solution.probability(nodeIndex)(j) << " \n";
+
+                NodeAssignment n;
+                n.name = i->first;
+                n.value = j;
+                result[n] = solution.probability(nodeIndex)(j);
+            }
+
+        }
+    } else {
+        bayesian_network_gibbs_sampler sampler;
+        //
+        std::vector<int> counts(bn->number_of_nodes(), 0);
+        //
+        //
+        const long rounds = 1500;
+        for (long i = 0; i < rounds; i++) {
+            sampler.sample_graph(*bn);
+
+            for (int j = 0; j < counts.size(); j++) {
+                //            cout<<node_value(*bn,j)<<"\n";
+                if (node_value(*bn, j) == 1) {
+                    counts[j]++;
+                }
+            }
+
+        }
+
+
+        for (std::map<std::string, int>::iterator n = nodeLabels.begin(); n != nodeLabels.end(); n++) {
+            NodeAssignment ass;
+            ass.name = n->first;
+            ass.value = 1;
+            //        cout<<counts[n->second]<<"\n";
+            result[ass] = (double) counts[n->second] / (double) rounds;
+
+        }
     }
 
-//        std::map<NodeAssignment, double> result;
-//    
-//    
-//        for (std::map<string, std::map<string, int> >::iterator i = nodeValues.begin(); i != nodeValues.end(); i++) {
-//            // print out the probability distribution for node i.  
-//            int nodeIndex = nodeLabels[i->first];
-//    
-//            for (int j = 0; j < i->second.size(); j++) {
-//                //            cout << "p(node " << i->first << "==" << j << ") = " << solution.probability(nodeIndex)(j) << " \n";
-//    
-//                NodeAssignment n;
-//                n.name = i->first;
-//                n.value = j;
-//                result[n] = solution.probability(nodeIndex)(j);
-//            }
-//    
-//        }
+
     return result;
 }
 
@@ -152,14 +116,6 @@ std::map<string, int> BayesianNetwork::getValues(int i) {
 
 std::map<string, int> BayesianNetwork::getValues(string label) {
     return nodeValues[label];
-}
-
-BayesianNetwork::BayesianNetwork(directed_graph<bayes_node>::kernel_1a_c *bn, std::map<string, int> nodeLabels, std::map<string, std::map<string, int> > nodeValues, std::vector<bool> isTemporal) {
-    this->nodeLabels = nodeLabels;
-    this->nodeValues = nodeValues;
-    this->isTemporal = isTemporal;
-    this->bn = bn;
-
 }
 
 bool BayesianNetwork::addMultiValueNode(string node, string parent, std::vector<string> values) {
@@ -279,11 +235,11 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vec
             set_node_probability(*bn, nodeIndex, 0, parent_state, 1 - p);
         }
     }
-//        cout << "CPT for node " << node << " " << nodeIndex << " = " << node_cpt_filled_out(*bn, nodeIndex) << "\n";
-//        for (int i = 0; i < parents.size(); i++) {
-//            cout << parents[i] << " ";
-//        }
-//        if (parents.size() > 0) cout << "\n";
+    //        cout << "CPT for node " << node << " " << nodeIndex << " = " << node_cpt_filled_out(*bn, nodeIndex) << "\n";
+    //        for (int i = 0; i < parents.size(); i++) {
+    //            cout << parents[i] << " ";
+    //        }
+    //        if (parents.size() > 0) cout << "\n";
     conditional_probability_table * table = (&bn->node(nodeIndex).data.table());
 
     if (parents.size() > 0) {
@@ -292,20 +248,20 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vec
             for (int j = 0; j < tableAssignments[i].size(); j++) {
                 parent_state.add(nodeLabels[parents[j]], tableAssignments[i][j]);
             }
-//                        cout << table->probability(0, parent_state) << "\n";
-//                        cout << table->probability(1, parent_state) << "\n";
+            //                        cout << table->probability(0, parent_state) << "\n";
+            //                        cout << table->probability(1, parent_state) << "\n";
         }
     } else {
         assignment parent_state;
-//                cout << table->probability(0, parent_state) << "\n";
-//                cout << table->probability(1, parent_state) << "\n";
+        //                cout << table->probability(0, parent_state) << "\n";
+        //                cout << table->probability(1, parent_state) << "\n";
     }
 }
 
 //creates a new node with different parents and a choice of  of different probability tables. For now we deal with only binary nodes.
 //More complex nodes need to be created by hand
 
-bool BayesianNetwork::addNode(string node, std::vector<string> parents, bool isTemporal, string probabilityMode, string dominantParent) {
+bool BayesianNetwork::addNode(string node, std::vector<string> parents, string probabilityMode, string dominantParent) {
     //check if parents exist  and load their values in tableVariables;
     std::vector<std::vector<int> > tableVariables;
 
@@ -352,7 +308,6 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, bool isT
     BOOST_FOREACH(string parent, parents) {
         bn->add_edge(nodeLabels[parent], nodeIndex);
     }
-    this->isTemporal.push_back(isTemporal);
 
 
     if (probabilityMode == "uniform") {
@@ -496,11 +451,11 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vec
         bn->add_edge(nodeLabels[parent], nodeIndex);
     }
 
-//        cout << "CPT for node " << node << " " << nodeIndex << "\n";
-//        for (int i = 0; i < parents.size(); i++) {
-//            cout << parents[i] << " ";
-//        }
-//        cout << "\n";
+    //        cout << "CPT for node " << node << " " << nodeIndex << "\n";
+    //        for (int i = 0; i < parents.size(); i++) {
+    //            cout << parents[i] << " ";
+    //        }
+    //        cout << "\n";
 
     for (probAssignment row : probTable) {
         assignment parentState;
@@ -508,17 +463,17 @@ bool BayesianNetwork::addNode(string node, std::vector<string> parents, std::vec
             int parentIndex = nodeLabels[parentValue.first];
             int value = nodeValues[parentValue.first][parentValue.second];
             parentState.add(parentIndex, value);
-            
-//            cout<<parentValue.first<<" "<<parentValue.second<<" ";
+
+            //            cout<<parentValue.first<<" "<<parentValue.second<<" ";
         }
-//        cout<<"\n";
+        //        cout<<"\n";
         set_node_probability(*bn, nodeIndex, 1, parentState, row.prob);
         set_node_probability(*bn, nodeIndex, 0, parentState, 1 - row.prob);
-//                cout << row.prob << "\n";
+        //                cout << row.prob << "\n";
     }
-//        for (auto a:nodeValues[node]) {
-//            cout<<a.first<<" "<<a.second<<"\n";
-//        }
+    //        for (auto a:nodeValues[node]) {
+    //            cout<<a.first<<" "<<a.second<<"\n";
+    //        }
 }
 
 bool BayesianNetwork::addExclusiveOrNode(string node, std::vector<string> parents) {
@@ -573,9 +528,9 @@ bool BayesianNetwork::addExclusiveOrNode(string node, std::vector<string> parent
             }
         }
 
-//        p = n_true == 1 ? 1 : 0;
-        p= n_true== 1 ? 0.9: 0.1;
-        
+        //        p = n_true == 1 ? 1 : 0;
+        p = n_true == 1 ? 0.9 : 0.1;
+
         set_node_probability(*bn, nodeIndex, 1, parent_state, p);
         set_node_probability(*bn, nodeIndex, 0, parent_state, 1 - p);
 

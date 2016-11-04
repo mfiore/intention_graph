@@ -13,7 +13,7 @@
 
 #include "IntentionGraph.h"
 
-IntentionGraph::IntentionGraph() {
+IntentionGraph::IntentionGraph(int approximation_loops) : n_approx(approximation_loops) {
     bn = NULL;
 }
 
@@ -34,16 +34,16 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
     if (bn != NULL) {
         delete bn;
     }
-    bn = new BayesianNetwork(bn_size);
+    bn = new BayesianNetwork(bn_size, n_approx);
 
     for (string c : contexts) {
-        bn->addNode(c, std::vector<string>(), false, "uniform", "");
+        bn->addNode(c, std::vector<string>(), "uniform", "");
     }
 
     std::vector<string> intention_list;
     for (int i = 0; i < intentions.size(); i++) {
         VariableSet mdp_state = mdps[i]->convertToParametrizedState(state);
-        if (std::find(mdps[i]->goal_states_.begin(), mdps[i]->goal_states_.end(), mdps[i]->map_state_enum_[mdp_state]) == mdps[i]->goal_states_.end()) {
+        if (!mdps[i]->isGoalState(mdp_state)) {
             bn->addNode(intentions[i].name, intentions[i].linked_contexts, intentions[i].influence);
             intention_list.push_back(intentions[i].name);
         }
@@ -63,7 +63,7 @@ void IntentionGraph::setGraph(std::vector<string> contexts, std::vector<Intentio
     for (string action : actions) {
         std::vector<string> parents = {action};
         bn->addMultiValueNode("distance_" + action, action, distanceValues);
-        bn->addNode("isFacing_" + action, parents, false, "dominantParent", action);
+        bn->addNode("isFacing_" + action, parents, "dominantParent", action);
         observation_nodes_.push_back("distance_" + action);
         observation_nodes_.push_back("isFacing_" + action);
     }
@@ -132,7 +132,8 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
         for (string a : actions) {
             string pa = mdps[i]->getParametrizedAction(a);
             //            cout<<"parametrized action is"<<pa<<"\n";
-            if (std::find(mdps[i]->actions_.begin(), mdps[i]->actions_.end(), pa) != mdps[i]->actions_.end()) {
+            std::vector<string> mdp_actions=mdps[i]->getActions();
+            if (std::find(mdp_actions.begin(), mdp_actions.end(), pa) != mdp_actions.end()) {
                 par_actions.push_back(pa);
             }
         }
@@ -172,7 +173,7 @@ void IntentionGraph::createActionNodes(std::vector<string> actions, std::vector<
             for (int i = 0; i < intention_list.size(); i++) {
                 string par_a = mdps[i]->getParametrizedAction(a);
                 probRow.parentValues[intention_list[i]] = intention_values[row[i]];
-                std::vector<string> mdp_actions = mdps[i]->actions_;
+                std::vector<string> mdp_actions = mdps[i]->getActions();
                 if (std::find(mdp_actions.begin(), mdp_actions.end(), par_a) == mdp_actions.end()) {
                     single_utilities[i] == 0;
                 } else {

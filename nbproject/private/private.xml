@@ -9,6 +9,8 @@
         <group>
             <file>file:/home/theworld/NetBeansProjects/intention_graph/BayesianNetwork.cpp</file>
             <file>file:/home/theworld/NetBeansProjects/intention_graph/IntentionGraph.cpp</file>
+            <file>file:/home/theworld/NetBeansProjects/intention_graph/BayesianNetwork.h</file>
+            <file>file:/home/theworld/NetBeansProjects/intention_graph/IntentionGraph.h</file>
         </group>
     </open-files>
 </project-private>
